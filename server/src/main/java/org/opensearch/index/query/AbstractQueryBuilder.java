@@ -80,6 +80,23 @@ public abstract class AbstractQueryBuilder<QB extends AbstractQueryBuilder<QB>> 
 
     }
 
+    /**
+     * Add filter in AND condition.
+     */
+    public QueryBuilder filter(QueryBuilder filter, FilterCombinationMode filterCombinationMode) {
+        if(filter == null){
+            return this;
+        }else{
+            if(FilterCombinationMode.AND.equals(filterCombinationMode) || filterCombinationMode == null) {
+                final BoolQueryBuilder modifiedQB = new BoolQueryBuilder();
+                modifiedQB.must(this);
+                modifiedQB.filter(filter);
+                return modifiedQB;
+            }
+            return this;
+        }
+    }
+
     protected AbstractQueryBuilder(StreamInput in) throws IOException {
         boost = in.readFloat();
         checkNegativeBoost(boost);

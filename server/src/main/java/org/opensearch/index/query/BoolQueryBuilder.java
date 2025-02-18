@@ -153,6 +153,19 @@ public class BoolQueryBuilder extends AbstractQueryBuilder<BoolQueryBuilder> {
     }
 
     /**
+     * Add a hybrid query filter to the filterClauses.
+     * @param filter the hybrid query builder
+     * @param filterCombinationMode the filter combination mode
+     * @return BoolQueryBuilder
+     */
+    public BoolQueryBuilder filter(QueryBuilder filter, FilterCombinationMode filterCombinationMode) {
+        if(FilterCombinationMode.AND.equals(filterCombinationMode) && filter != null) {
+            filter(filter);
+        }
+        return this;
+    }
+
+    /**
      * Adds a query that <b>must not</b> appear in the matching documents.
      * No {@code null} value allowed.
      */
