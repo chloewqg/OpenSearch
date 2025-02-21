@@ -376,6 +376,11 @@ public class SpanNearQueryBuilder extends AbstractQueryBuilder<SpanNearQueryBuil
         }
 
         @Override
+        public QueryBuilder filter(QueryBuilder filter, FilterCombinationMode filterCombinationMode) {
+            throw new UnsupportedOperationException("You can't add a filter to a SpanGapQueryBuilder");
+        }
+
+        @Override
         public String queryName() {
             throw new UnsupportedOperationException();
         }

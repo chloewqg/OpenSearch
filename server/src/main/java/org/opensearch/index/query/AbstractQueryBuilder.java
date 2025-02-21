@@ -86,6 +86,40 @@ public abstract class AbstractQueryBuilder<QB extends AbstractQueryBuilder<QB>> 
         queryName = in.readOptionalString();
     }
 
+    /**
+     * Check the input parameters of filter function.
+     * @param filter filter to combine with current query builder
+     * @param filterCombinationMode filter combination mode.
+     * @return true if parameters are valid. Returns false when the filter is null. Throws IllegalArgumentException on
+     * null filterCombinationMode.
+     */
+    public static boolean validateFilterParams(QueryBuilder filter, FilterCombinationMode filterCombinationMode) {
+        if (filter == null) {
+            return false;
+        }
+        if (filterCombinationMode == null) {
+            // Unexpected FilterCombinationMode
+            throw new IllegalArgumentException("FilterCombinationMode cannot be null.");
+        }
+        return true;
+    }
+
+    /**
+     * Combine filter with current query builder based on filterCombinationMode
+     * @param filter filter to combine with current query builder
+     * @param filterCombinationMode filter combination mode.
+     * @return query builder with filter combined
+     */
+    public QueryBuilder filter(QueryBuilder filter, FilterCombinationMode filterCombinationMode) {
+        if (!validateFilterParams(filter, filterCombinationMode)) {
+            return this;
+        }
+        final BoolQueryBuilder modifiedQB = new BoolQueryBuilder();
+        modifiedQB.must(this);
+        modifiedQB.filter(filter);
+        return modifiedQB;
+    }
+
     @Override
     public final void writeTo(StreamOutput out) throws IOException {
         out.writeFloat(boost);

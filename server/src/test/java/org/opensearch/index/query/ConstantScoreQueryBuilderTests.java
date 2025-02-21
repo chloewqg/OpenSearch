@@ -143,4 +143,29 @@ public class ConstantScoreQueryBuilderTests extends AbstractQueryTestCase<Consta
 
         assertEquals(2, visitorQueries.size());
     }
+
+    public void testFilter() {
+        // Test for for AND Filter Combination Mode
+        BoolQueryBuilder filterBuilder = new BoolQueryBuilder();
+        ConstantScoreQueryBuilder constantScoreQueryBuilder = new ConstantScoreQueryBuilder(filterBuilder);
+        QueryBuilder filter = QueryBuilders.matchAllQuery();
+        constantScoreQueryBuilder.filter(filter, FilterCombinationMode.AND);
+        assertEquals(1, filterBuilder.filter().size());
+        assertEquals(filter, filterBuilder.filter().get(0));
+
+        // Test for Null Filter
+        filterBuilder = new BoolQueryBuilder();
+        constantScoreQueryBuilder = new ConstantScoreQueryBuilder(filterBuilder);
+        constantScoreQueryBuilder.filter(null, FilterCombinationMode.AND);
+        assertEquals(0, filterBuilder.filter().size());
+
+        // Test for null Filter Combination Mode
+        filterBuilder = new BoolQueryBuilder();
+        final ConstantScoreQueryBuilder queryBuilderForUnsupportedMode = new ConstantScoreQueryBuilder(filterBuilder);
+        assertThrows(
+            "FilterCombinationMode is null.",
+            IllegalArgumentException.class,
+            () -> queryBuilderForUnsupportedMode.filter(filter, null)
+        );
+    }
 }

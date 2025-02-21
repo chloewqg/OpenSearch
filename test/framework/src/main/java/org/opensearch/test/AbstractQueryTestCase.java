@@ -63,7 +63,10 @@ import org.opensearch.core.xcontent.XContentGenerator;
 import org.opensearch.core.xcontent.XContentParseException;
 import org.opensearch.core.xcontent.XContentParser;
 import org.opensearch.index.query.AbstractQueryBuilder;
+import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.index.query.FilterCombinationMode;
 import org.opensearch.index.query.QueryBuilder;
+import org.opensearch.index.query.QueryBuilders;
 import org.opensearch.index.query.QueryRewriteContext;
 import org.opensearch.index.query.QueryShardContext;
 import org.opensearch.index.query.Rewriteable;
@@ -868,4 +871,24 @@ public abstract class AbstractQueryTestCase<QB extends AbstractQueryBuilder<QB>>
         assertTrue("query should be cacheable: " + queryBuilder.toString(), context.isCacheable());
     }
 
+    /**
+     * Check if a filter can be applied to the abstract query builder.
+     * @throws UnsupportedOperationException
+     */
+    public void testFilter() throws IOException {
+        QB queryBuilder = createTestQueryBuilder();
+        QueryBuilder filter = QueryBuilders.matchAllQuery();
+        // Test for Null Filter case
+        QueryBuilder returnedQuerybuilder = queryBuilder.filter(null, FilterCombinationMode.AND);
+        assertEquals(queryBuilder, returnedQuerybuilder);
+
+        // Test for unspported Filter Combination Mode
+        assertThrows("FilterCombinationMode is null.", IllegalArgumentException.class, () -> queryBuilder.filter(filter, null));
+
+        // Test for AND case
+        returnedQuerybuilder = queryBuilder.filter(filter, FilterCombinationMode.AND);
+        assertTrue(returnedQuerybuilder instanceof BoolQueryBuilder);
+        assertTrue(((BoolQueryBuilder) returnedQuerybuilder).filter().size() == 1);
+        assertEquals(filter, ((BoolQueryBuilder) returnedQuerybuilder).filter().get(0));
+    }
 }

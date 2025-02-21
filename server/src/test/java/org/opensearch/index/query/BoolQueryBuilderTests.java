@@ -327,6 +327,31 @@ public class BoolQueryBuilderTests extends AbstractQueryTestCase<BoolQueryBuilde
     }
 
     /**
+     * Check if a filter can be applied to the BoolQuery
+     * @throws IOException
+     */
+    public void testFilter() throws IOException {
+        // Test for AND filter case
+        String query = "{\"bool\" : {\"filter\" : null } }";
+        QueryBuilder filter = QueryBuilders.matchAllQuery();
+        BoolQueryBuilder builder = (BoolQueryBuilder) parseQuery(query);
+        assertFalse(builder.filter(filter, FilterCombinationMode.AND).filter().isEmpty());
+        assertEquals(builder.filter(filter, FilterCombinationMode.AND).filter().get(0), filter);
+
+        // Test for null case
+        builder = (BoolQueryBuilder) parseQuery(query);
+        assertTrue(builder.filter(null, FilterCombinationMode.AND).filter().isEmpty());
+
+        // Test for null filterCombinationMode
+        final QueryBuilder builderForUnsupportedFilter = (BoolQueryBuilder) parseQuery(query);
+        assertThrows(
+            "FilterCombinationMode is null.",
+            IllegalArgumentException.class,
+            () -> builderForUnsupportedFilter.filter(filter, null)
+        );
+    }
+
+    /**
      * test that unknown query names in the clauses throw an error
      */
     public void testUnknownQueryName() throws IOException {

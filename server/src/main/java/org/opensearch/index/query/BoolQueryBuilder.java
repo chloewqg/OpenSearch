@@ -153,6 +153,20 @@ public class BoolQueryBuilder extends AbstractQueryBuilder<BoolQueryBuilder> {
     }
 
     /**
+     * Add query filter to filterClauses.
+     * @param filter the query filter
+     * @param filterCombinationMode the filter combination mode
+     * @return BoolQueryBuilder
+     */
+    public BoolQueryBuilder filter(QueryBuilder filter, FilterCombinationMode filterCombinationMode) {
+        if (!validateFilterParams(filter, filterCombinationMode)) {
+            return this;
+        }
+        filter(filter);
+        return this;
+    }
+
+    /**
      * Adds a query that <b>must not</b> appear in the matching documents.
      * No {@code null} value allowed.
      */
